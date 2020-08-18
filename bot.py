@@ -12,6 +12,8 @@ client = commands.Bot(command_prefix = '.')
 
 datetimern = datetime.now(pytz.timezone('US/Pacific'))
 timern = str(datetimern.hour) + ':' + str(datetimern.minute)
+#WARNING: setting up the bot during any time ending with 9 will cause an infinite loop
+setupTime = str(datetimern.hour) + ':' + str(datetimern.minute + 1)
 weedTimeAm = '4:20'
 weedTimePm = '16:20'
 
@@ -24,22 +26,31 @@ async def isTime(ctx):
 
 @client.event
 async def on_ready():
-    print ('Bot is ready!')
+    print ('Bot is Online!')
 
 async def constCheck():
     await client.wait_until_ready()
-    while not client.is_closed():
-        global datetimern
-        global timern
-        datetimern = datetime.now(pytz.timezone('US/Pacific'))
-        timern = str(datetimern.hour) + ':' + str(datetimern.minute)
-        if (timern == weedTimeAm or timern == weedTimePm):
-            channel = client.get_channel(446140171713511426)
-            await channel.send('4:20 Blaze It')
-            await asyncio.sleep(60)
+    global datetimern
+    global timern
+    while client.is_ready():
+        if (timern == setupTime):
+            print('Bot Timer Initiated')
+            while not client.is_closed():
+                datetimern = datetime.now(pytz.timezone('US/Pacific'))
+                timern = str(datetimern.hour) + ':' + str(datetimern.minute)
+                if (timern == weedTimeAm or timern == weedTimePm):
+                    #THIS ID BELOW IS FOR A TEST SERVER
+                    channel = client.get_channel(446140171713511426)
+                    await channel.send('4:20 Blaze It')
+                    await asyncio.sleep(60)
+                else:
+                    await asyncio.sleep(60)
         else:
-            await asyncio.sleep(60)
+            datetimern = datetime.now(pytz.timezone('US/Pacific'))
+            timern = str(datetimern.hour) + ':' + str(datetimern.minute)
+            await asyncio.sleep(2)
 
 print(timern)
+print(setupTime)
 client.loop.create_task(constCheck())
 client.run(token)
