@@ -48,7 +48,7 @@ async def constCheck():
         else:
             datetimern = datetime.now(pytz.timezone('US/Pacific'))
             timern = str(datetimern.hour) + ':' + str(datetimern.minute)
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
 
 print(timern)
 print(setupTime)
