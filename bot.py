@@ -6,7 +6,8 @@ from discord.ext import commands
 import asyncio
 import os
 
-token = os.environ['DISCORD_TOKEN']
+#token = os.environ['DISCORD_TOKEN']
+token = 'NzM3OTU1NTM3NjEzODgxMzg0.XyE4pg.37kqoHVfX9OXpXq-_oaoWKkRyP8'
 
 client = commands.Bot(command_prefix = '.')
 
@@ -16,6 +17,14 @@ timern = str(datetimern.hour) + ':' + str(datetimern.minute)
 setupTime = str(datetimern.hour) + ':' + str(datetimern.minute + 1)
 weedTimeAm = '4:20'
 weedTimePm = '16:20'
+
+@client.command()
+async def say(ctx, *args):
+    await ctx.channel.purge(limit=1)
+    text = ''
+    for arg in args:
+        text += '{} '.format(arg)
+    await ctx.send(text)
 
 @client.command()
 async def isTime(ctx):
