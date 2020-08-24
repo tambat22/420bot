@@ -13,18 +13,23 @@ client = commands.Bot(command_prefix = '.')
 
 datetimern = datetime.now(pytz.timezone('US/Pacific'))
 timern = str(datetimern.hour) + ':' + str(datetimern.minute)
-#WARNING: setting up the bot during any time ending with 9 will cause an infinite loop
+#WARNING: setting up the bot during any time ending with 59 will cause an infinite loop
 setupTime = str(datetimern.hour) + ':' + str(datetimern.minute + 1)
 weedTimeAm = '4:20'
 weedTimePm = '16:20'
 
 @client.command()
-async def say(ctx, *args):
+async def sayWide(ctx, *, args):
     await ctx.channel.purge(limit=1)
     text = ''
     for arg in args:
         text += '{} '.format(arg)
     await ctx.send(text)
+
+@client.command()
+async def say(ctx, *, msg):
+    await ctx.message.delete()
+    await ctx.send(msg)
 
 @client.command()
 async def isTime(ctx):
