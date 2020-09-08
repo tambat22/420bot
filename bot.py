@@ -1,29 +1,57 @@
 import discord
+from discord.ext import commands
 import time
 from datetime import datetime
 import pytz
-from discord.ext import commands
 import asyncio
 import os
 
-#token = os.environ['DISCORD_TOKEN']
-token = 'NzM3OTU1NTM3NjEzODgxMzg0.XyE4pg.37kqoHVfX9OXpXq-_oaoWKkRyP8'
-
-client = commands.Bot(command_prefix = '.')
-
-datetimern = datetime.now(pytz.timezone('US/Pacific'))
-timern = str(datetimern.hour) + ':' + str(datetimern.minute)
-#WARNING: setting up the bot during any time ending with 59 will cause an infinite loop
-setupTime = str(datetimern.hour) + ':' + str(datetimern.minute + 1)
 weedTimeAm = '4:20'
 weedTimePm = '16:20'
+
+TOKEN = open("token.txt","r").readline()
+client = commands.Bot(command_prefix = '.')
+
+def getTimeRn():
+    global datetimern
+    global timern
+    datetimern = datetime.now(pytz.timezone('US/Pacific'))
+    timern = str(datetimern.hour) + ':' + str(datetimern.minute)
+    return timern
+
+#WARNING: setting up the bot during any time ending with 59 will cause an infinite loop
+def getSetupTime():
+    global setupTime
+    setupTime = str(datetimern.hour) + ':' + str(datetimern.minute + 1)
+    return setupTime
+
+client.remove_command('help')
+@client.command()
+async def help(ctx):
+    embed = discord.Embed(
+    color = discord.Color.green(),
+    description = 'This bot automatically says "4:20" at 4:20 PST',
+    title = ''
+    )
+    embed.set_author(name='420 Bot', url='https://discord.com/api/oauth2/authorize?client_id=737955537613881384&permissions=271969360&scope=bot', icon_url='https://i.imgur.com/Kgp8PbY.png')
+    embed.set_footer(text='Made by: TEIN#0803')
+    embed.add_field(name='Commands: ', value='__')
+    embed.add_field(name='.isTime', value='Checks if the current time is 4:20', inline=False)
+    embed.add_field(name='.say <message>', value='Makes bot say a message', inline=False)
+    embed.add_field(name='.sayWide <message>', value='Makes bot say a message, but w i d e', inline=False)
+    embed.add_field(name='.ping', value='Returns bot response time in milliseconds', inline=False)
+    await ctx.send(embed=embed)
+
+@client.command()
+async def ping(ctx):
+    await ctx.send(f'Ping: {round (client.latency * 1000)}ms ')
 
 @client.command()
 async def sayWide(ctx, *, args):
     await ctx.channel.purge(limit=1)
     text = ''
     for arg in args:
-        text += '{} '.format(arg)
+        text += f'{arg} '
     await ctx.send(text)
 
 @client.command()
@@ -44,27 +72,32 @@ async def on_ready():
 
 async def constCheck():
     await client.wait_until_ready()
-    global datetimern
-    global timern
     while client.is_ready():
         if (timern == setupTime):
             print('Bot Timer Initiated')
             while not client.is_closed():
-                datetimern = datetime.now(pytz.timezone('US/Pacific'))
-                timern = str(datetimern.hour) + ':' + str(datetimern.minute)
+                getTimeRn()
                 if (timern == weedTimeAm or timern == weedTimePm):
-                    #THIS ID BELOW IS FOR A TEST SERVER
-                    channel = client.get_channel(446140171713511426)
-                    await channel.send('4:20 Blaze It')
+                    for server in client.guilds:
+                            # Spin through every server
+                            for channel in server.channels:
+                                # Channels on the server
+                                if not isinstance(channel, discord.VoiceChannel) and not isinstance(channel, discord.CategoryChannel):
+                                    if channel.permissions_for(server.me).send_messages:
+                                        await channel.send('4:20 Blaze It')
+                                        # So that we don't send to every channel:
+                                        break
+                                    else:
+                                        pass
+
                     await asyncio.sleep(60)
                 else:
                     await asyncio.sleep(60)
         else:
-            datetimern = datetime.now(pytz.timezone('US/Pacific'))
-            timern = str(datetimern.hour) + ':' + str(datetimern.minute)
+            getTimeRn()
             await asyncio.sleep(1)
 
-print(timern)
-print(setupTime)
+print(getTimeRn())
+print(getSetupTime())
 client.loop.create_task(constCheck())
-client.run(token)
+client.run(TOKEN)
