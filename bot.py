@@ -9,7 +9,7 @@ import os
 weedTimeAm = '4:20'
 weedTimePm = '16:20'
 
-TOKEN = open("token.txt","r").readline()
+TOKEN = os.environ['DISCORD_TOKEN']
 client = commands.Bot(command_prefix = '.')
 
 def getTimeRn():
